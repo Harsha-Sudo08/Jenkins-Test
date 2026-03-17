@@ -3,7 +3,9 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'rustc --version'
+                sh '
+                    echo "building the RUST project"
+                '
             }
         }
     }
