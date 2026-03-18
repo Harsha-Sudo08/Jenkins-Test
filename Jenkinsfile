@@ -23,7 +23,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo "building"
+                echo "building changes"
             }
         }
 
