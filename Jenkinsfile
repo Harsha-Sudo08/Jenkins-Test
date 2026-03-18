@@ -1,18 +1,26 @@
 pipeline {
     agent any
+
+    triggers {
+        githubPush()
+    }
+
     stages {
-        stage('build') {
+        stage('Checkout') {
             steps {
-                sh """
-                echo "building the RUST projects"
-                """
+                checkout scm
             }
         }
-        stage('run') {
+
+        stage('Build') {
             steps {
-                sh """
-                echo "RUN THE APPLICATION"
-                """
+                echo "building"
+            }
+        }
+
+        stage('Run') {
+            steps {
+                echo "running"
             }
         }
         stage('run') {
