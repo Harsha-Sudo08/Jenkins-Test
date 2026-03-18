@@ -8,5 +8,10 @@ pipeline {
                 '
             }
         }
+        stage('run') {
+            steps {
+                sh 'echo "RUN THE APPLICATION"'
+            }
+        }
     }
 }
