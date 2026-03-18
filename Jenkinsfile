@@ -4,7 +4,7 @@ pipeline {
         stage('build') {
             steps {
                 sh '
-                    echo "building the RUST project"
+                    echo "building the RUST projects"
                 '
             }
         }
