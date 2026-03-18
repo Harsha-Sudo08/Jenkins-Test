@@ -1,18 +1,32 @@
 pipeline {
     agent any
+
+    triggers {
+        githubPush()
+    }
+
     stages {
-        stage('build') {
+        stage('Checkout') {
             steps {
-                sh """
-                echo "building the RUST projects"
-                """
+                checkout scm
             }
         }
-        stage('run') {
+
+        stage('Build') {
             steps {
-                sh """
-                echo "RUN THE APPLICATION"
-                """
+                sh '''
+                echo "Building Rust project..."
+                cargo build --release
+                '''
+            }
+        }
+
+        stage('Run') {
+            steps {
+                sh '''
+                echo "Running application..."
+                ./target/release/your_binary_name
+                '''
             }
         }
     }
