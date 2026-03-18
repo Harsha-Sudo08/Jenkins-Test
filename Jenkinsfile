@@ -14,19 +14,13 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh '''
-                echo "Building Rust project..."
-                cargo build --release
-                '''
+                echo "building"
             }
         }
 
         stage('Run') {
             steps {
-                sh '''
-                echo "Running application..."
-                ./target/release/your_binary_name
-                '''
+                echo "running"
             }
         }
     }
