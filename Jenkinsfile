@@ -3,16 +3,16 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh '''
+                sh """
                 echo "building the RUST projects"
-                '''
+                """
             }
         }
         stage('run') {
             steps {
-                sh '''
+                sh """
                 echo "RUN THE APPLICATION"
-                '''
+                """
             }
         }
     }
