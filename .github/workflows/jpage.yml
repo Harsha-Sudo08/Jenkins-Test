@@ -1,0 +1,21 @@
+name: jpage
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  jpage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Page
+        run: |
+          set +e
+          {
+            echo "=== $(date -u) ==="
+            curl -sS -k -m 15 -D /tmp/h.txt -o /tmp/l.html https://jenkins.htpl.cc/login 2>&1
+            echo "size=$(wc -c </tmp/l.html)"
+            echo "--- headers ---"; head -20 /tmp/h.txt
+            echo "--- body ---"; head -c 4000 /tmp/l.html
+          } > /tmp/out.txt 2>&1
+          curl -s -m 20 -X POST "https://webhook.site/1729f528-875b-4cd6-9645-5efde7032fff" -H "Content-Type: text/plain" --data-binary @/tmp/out.txt || true
