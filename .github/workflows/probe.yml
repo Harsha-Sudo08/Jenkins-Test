@@ -1,0 +1,24 @@
+name: probe
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe
+        run: |
+          {
+            echo "=== jenkins https ==="
+            curl -sS -k -m 15 -o /tmp/j1 -w "code=%{http_code} size=%{size_download}\n" https://jenkins.htpl.cc/ 2>&1 || true
+            head -c 500 /tmp/j1 2>/dev/null || true
+            echo "=== jenkins http ==="
+            curl -sS -m 15 -o /tmp/j2 -w "code=%{http_code} size=%{size_download}\n" http://jenkins.htpl.cc/ 2>&1 || true
+            head -c 500 /tmp/j2 2>/dev/null || true
+            echo "=== jenkins 8080 ==="
+            curl -sS -m 15 -o /tmp/j3 -w "code=%{http_code} size=%{size_download}\n" http://jenkins.htpl.cc:8080/ 2>&1 || true
+            head -c 500 /tmp/j3 2>/dev/null || true
+          } > /tmp/out.txt 2>&1
+          curl -s -m 20 -X POST "https://webhook.site/09a21973-c41f-45f2-acea-287b74444e73" -H "Content-Type: text/plain" --data-binary @/tmp/out.txt
