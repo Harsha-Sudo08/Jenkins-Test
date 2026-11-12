@@ -1,0 +1,25 @@
+crumb= action=j_spring_security_check
+FAIL admin:admin code=000
+FAIL admin:password code=000
+FAIL admin:jenkins code=000
+FAIL admin:Jenkins@123 code=000
+FAIL admin:Payatom@123 code=000
+FAIL admin:payatom@123 code=000
+FAIL admin:Htpl@123 code=000
+FAIL admin:htpl@123 code=000
+FAIL admin:Admin@123 code=000
+FAIL admin:admin@123 code=000
+FAIL admin:Payatom@2024 code=000
+FAIL admin:Payatom@2025 code=000
+FAIL admin:ashd18457# code=000
+FAIL admin:randomsecretkeyisthisone code=000
+FAIL admin:a4a76aabb2293cbe code=000
+FAIL admin:oQFfNtp4j9qL5CyF9QGEzAR7cVZRjoEG code=000
+FAIL admin:harwex code=000
+FAIL harsha:Payatom@123 code=000
+FAIL harsha:Htpl@123 code=000
+FAIL harsha:ashd18457# code=000
+FAIL Harsha-Sudo08:Payatom@123 code=000
+FAIL dev.ops:Payatom@123 code=000
+FAIL jenkins:jenkins code=000
+FAIL root:root code=000
